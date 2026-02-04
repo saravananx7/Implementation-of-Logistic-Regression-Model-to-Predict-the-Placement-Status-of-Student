@@ -8,10 +8,11 @@ To write a program to implement the the Logistic Regression Model to Predict the
 2. Anaconda – Python 3.7 Installation / Jupyter notebook
 
 ## Algorithm
-1. 
-2. 
-3. 
-4. 
+1.Load the student placement dataset and preprocess it.
+2.Split the data into training and testing sets.
+3.Train the Logistic Regression model using training data.
+4.Predict placement status and evaluate the model.
+
 
 ## Program:
 
@@ -23,83 +24,82 @@ RegisterNumber:  25013282
 
 ```
 # Logistic Regression for Student Placement Prediction
-
-# 1️ Import Libraries
 import pandas as pd
-import numpy as np
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-# 2️ Load Dataset
-data = pd.read_csv("Placement_Data.csv")   
+from sklearn.preprocessing import LabelEncoder
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
 
-print("Dataset Preview:")
-print(data.head())
+df = pd.read_csv(r"C:\Users\acer\Downloads\Placement_Data.csv")
 
-# 3️ Drop Unnecessary Columns
-data = data.drop(["sl_no", "salary"], axis=1)
+df = df.drop(["sl_no", "salary"], axis=1)
 
-# 4️ Convert Target Variable (status) to Binary
-# Placed = 1, Not Placed = 0
-data["status"] = data["status"].map({"Placed": 1, "Not Placed": 0})
+df = df.dropna()
+df = df.drop_duplicates()
 
-# 5️ Separate Features and Target
-X = data.drop("status", axis=1)
-y = data["status"]
 
-# 6️ One-Hot Encode Categorical Variables
-X = pd.get_dummies(X, drop_first=True)
+le = LabelEncoder()
+categorical_columns = [
+    "gender", "ssc_b", "hsc_b", "hsc_s",
+    "degree_t", "workex", "specialisation", "status"
+]
 
-print("\nAfter Encoding:")
-print(X.head())
+for col in categorical_columns:
+    df[col] = le.fit_transform(df[col])
 
-# 7️ Feature Scaling
-scaler = StandardScaler()
-X_scaled = scaler.fit_transform(X)
+X = df.drop("status", axis=1)
+y = df["status"]
 
-# 8️ Train-Test Split
 X_train, X_test, y_train, y_test = train_test_split(
-    X_scaled, y, test_size=0.2, random_state=42
+    X, y, test_size=0.2, random_state=0
 )
 
-# 9️ Train Logistic Regression Model
-model = LogisticRegression(max_iter=1000)
+model = LogisticRegression(solver="liblinear")
 model.fit(X_train, y_train)
 
-# 10 Make Predictions
+
 y_pred = model.predict(X_test)
-y_prob = model.predict_proba(X_test)[:, 1]
 
-# 1️1 Model Evaluation
-print("\nAccuracy:", accuracy_score(y_test, y_pred))
 
-print("\nClassification Report:")
-print(classification_report(y_test, y_pred))
+accuracy = accuracy_score(y_test, y_pred)
 
-# Confusion Matrix
 cm = confusion_matrix(y_test, y_pred)
+
+
+report = classification_report(y_test, y_pred)
+
+print("\n" + "="*60)
+print("        LOGISTIC REGRESSION CLASSIFICATION REPORT")
+print("="*60)
+print(report)
+print("="*60)
+print(f"Accuracy of the Model : {accuracy:.4f}")
+print("="*60)
+
+
 sns.heatmap(cm, annot=True, fmt="d", cmap="Blues")
 plt.xlabel("Predicted")
 plt.ylabel("Actual")
 plt.title("Confusion Matrix - Placement Prediction")
 plt.show()
+
+sample_input = pd.DataFrame(
+    [[1, 80, 1, 90, 1, 1, 90, 1, 0, 85, 1, 85]],
+    columns=X.columns
+)
+
+sample_prediction = model.predict(sample_input)
+print("\nSample Prediction:", sample_prediction)
 ```
 
 ## Output:
 
-Dataset Preview:
-<img width="704" height="328" alt="image" src="https://github.com/user-attachments/assets/eb10f3ca-5c10-440e-9c5e-c7e38ae22e93" />
+<img width="773" height="376" alt="image" src="https://github.com/user-attachments/assets/6ce14456-5e6c-41d5-b422-10571b5d3ac0" />
 
-After Encoding:
-<img width="679" height="515" alt="image" src="https://github.com/user-attachments/assets/842d637e-7545-40d2-ab0f-1c4176954ba4" />
-
-
-
-
+<img width="706" height="606" alt="image" src="https://github.com/user-attachments/assets/3103edc7-9868-4097-8c22-eb00eb1a5bea" />
 
 
 ## Result:
